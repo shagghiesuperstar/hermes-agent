@@ -1100,3 +1100,25 @@ not the specific names.
 
 Reviewers should reject new change-detector tests; authors should convert
 them into invariants before re-requesting review.
+
+## Supply-Chain Security — DO NOT BYPASS
+
+These controls are active on this machine and must not be circumvented:
+
+- **min-release-age / minimumReleaseAge**: If `bun add`, `npm install`, or `pnpm add`
+  fails with a release-age error, DO NOT retry with `--no-frozen-lockfile`,
+  `--legacy-peer-deps`, a different registry URL, or any flag that bypasses the cooldown.
+  Report the blocked package name and version to the operator and stop.
+
+- **ignore-scripts=true**: If a package fails to build because its postinstall script
+  was blocked, DO NOT re-run with `--ignore-scripts=false` autonomously.
+  Show the operator the script content and wait for explicit approval.
+
+- **Lockfile integrity**: Do not delete or regenerate the lockfile to resolve conflicts.
+  Report the conflict and wait for operator review.
+
+- **Exact versions**: Do not add `^` or `~` when editing package.json.
+  Always write exact versions (e.g. `"express": "4.21.2"`, not `"^4.21.2"`).
+
+Bypassing any of the above silently removes the defense layer they provide and
+is a higher-risk action than waiting for operator review.
